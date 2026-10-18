@@ -6,12 +6,16 @@ using Map = Microsoft.Maui.Controls.Maps.Map;
 
 namespace LocationTracker.Views;
 
+/// <summary>Hosts the native map and draws the heat-map circles produced by <see cref="MainViewModel"/>.</summary>
 public partial class MainPage : ContentPage
 {
     private readonly MainViewModel _viewModel;
     private Map? _map;
+
+    // Remembers the latest center request so it can be applied once the native map has loaded.
     private LocationRecord? _pendingCenter;
 
+    /// <summary>Creates the page and connects view-model events to map updates.</summary>
     public MainPage(MainViewModel viewModel)
     {
         InitializeComponent();
@@ -22,6 +26,7 @@ public partial class MainPage : ContentPage
         _viewModel.HistoryChanged += (_, _) => RenderHeatMap();
         _viewModel.CenterRequested += (_, location) => CenterMap(location);
 
+        // The map is created in code so a native initialization failure leaves the rest of the page usable.
         try
         {
             _map = new Map { MapType = MapType.Street, IsShowingUser = false };
@@ -41,8 +46,9 @@ public partial class MainPage : ContentPage
         }
 
 #if ANDROID
-        var context = Android.App.Application.Context;
-        var metadata = context.PackageManager?.GetApplicationInfo(context.PackageName!, Android.Content.PM.PackageInfoFlags.MetaData)?.MetaData;
+        // Google Maps on Android renders a blank grid without a real key; explain that instead.
+        Android.Content.Context context = Android.App.Application.Context;
+        Android.OS.Bundle? metadata = context.PackageManager?.GetApplicationInfo(context.PackageName!, Android.Content.PM.PackageInfoFlags.MetaData)?.MetaData;
         string? key = metadata?.GetString("com.google.android.geo.API_KEY");
         if (string.IsNullOrWhiteSpace(key) || key == "YOUR_GOOGLE_MAPS_API_KEY")
         {
@@ -51,6 +57,7 @@ public partial class MainPage : ContentPage
 #endif
     }
 
+    /// <inheritdoc />
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -71,6 +78,7 @@ public partial class MainPage : ContentPage
             _map.Pins.Clear();
             foreach (HeatMapCell cell in _viewModel.HeatCells)
             {
+                // Relative-density bands: low (blue) up to 33%, medium (amber) up to 66%, high (red) above.
                 Color color = cell.Density <= 0.33 ? Color.FromArgb("#1477DF")
                     : cell.Density <= 0.66 ? Color.FromArgb("#F4AA24") : Color.FromArgb("#E33455");
                 _map.MapElements.Add(new Circle
@@ -79,6 +87,7 @@ public partial class MainPage : ContentPage
                     Radius = Distance.FromMeters(cell.RadiusMeters),
                     StrokeColor = color.WithAlpha(0.8f),
                     StrokeWidth = 1,
+                    // Opacity rises from 0.2 to 0.65 with density, so street names stay readable underneath.
                     FillColor = color.WithAlpha((float)(0.2 + 0.45 * cell.Density))
                 });
             }
@@ -102,6 +111,8 @@ public partial class MainPage : ContentPage
     private void CenterMap(LocationRecord record)
     {
         _pendingCenter = record;
+
+        // MoveToRegion needs the native handler; the Loaded handler retries with _pendingCenter.
         if (_map?.Handler is null)
         {
             return;

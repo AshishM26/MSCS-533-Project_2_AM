@@ -6,6 +6,7 @@ using LocationTracker.Services;
 
 namespace LocationTracker.ViewModels;
 
+/// <summary>Screen state and commands for the tracker: history, heat-map cells, and tracking lifecycle.</summary>
 public sealed class MainViewModel : INotifyPropertyChanged
 {
     private readonly ILocationDatabase _database;
@@ -13,10 +14,13 @@ public sealed class MainViewModel : INotifyPropertyChanged
     private readonly HeatMapService _heatMap;
     private readonly List<LocationRecord> _records = [];
     private bool _isBusy;
+
+    // False while the window is in the background, so Start cannot be tapped mid-suspend.
     private bool _isActive = true;
     private bool _initialized;
     private string _statusMessage = "Ready — tap Start Tracking to begin.";
 
+    /// <summary>Wires commands and subscribes to tracking events.</summary>
     public MainViewModel(ILocationDatabase database, ILocationTrackingService tracking, HeatMapService heatMap)
     {
         _database = database;
@@ -38,6 +42,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         ClearHistoryCommand = new AsyncCommand(ClearHistoryAsync,
             () => _initialized && !_isBusy && !IsTracking && SampleCount > 0, ReportError);
 
+        // Tracking events arrive on background threads; bound properties must change on the UI thread.
         _tracking.StateChanged += (_, _) => MainThread.BeginInvokeOnMainThread(() =>
         {
             StatusMessage = _tracking.StatusMessage;
@@ -63,14 +68,24 @@ public sealed class MainViewModel : INotifyPropertyChanged
         });
     }
 
+    /// <summary>Whether location sampling is running.</summary>
     public bool IsTracking => _tracking.IsTracking;
+
+    /// <summary>Number of saved readings, shown in the SAMPLES counter.</summary>
     public int SampleCount => _records.Count;
+
+    /// <summary>Most recent saved reading, or <see langword="null"/> when history is empty.</summary>
     public LocationRecord? LatestLocation => _records.LastOrDefault();
+
+    /// <summary>Aggregated density cells the page draws as map circles.</summary>
     public IReadOnlyList<HeatMapCell> HeatCells { get; private set; } = [];
+
+    /// <summary>Local time and accuracy of the latest reading for the status area.</summary>
     public string LastReadingText => LatestLocation is { } location
         ? $"Last reading {DateTime.SpecifyKind(location.TimestampUtc, DateTimeKind.Utc).ToLocalTime():HH:mm:ss} · accuracy {location.AccuracyMeters?.ToString("0") ?? "unknown"} m"
         : "No saved locations yet";
 
+    /// <summary>User-facing status line.</summary>
     public string StatusMessage
     {
         get => _statusMessage;
@@ -81,15 +96,31 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Starts sampling once saved history has loaded.</summary>
     public AsyncCommand StartTrackingCommand { get; }
+
+    /// <summary>Stops sampling and keeps saved history.</summary>
     public AsyncCommand StopTrackingCommand { get; }
+
+    /// <summary>Moves the map to the latest saved reading.</summary>
     public AsyncCommand CenterCommand { get; }
+
+    /// <summary>Deletes all history after the user confirms.</summary>
     public AsyncCommand ClearHistoryCommand { get; }
+
+    /// <summary>Confirmation dialog supplied by the page, keeping UI types out of the view model.</summary>
     public Func<Task<bool>>? ConfirmClearAsync { get; set; }
+
+    /// <inheritdoc />
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Raised when <see cref="HeatCells"/> or the latest reading changes and the map must redraw.</summary>
     public event EventHandler? HistoryChanged;
+
+    /// <summary>Raised when the map should center on a reading.</summary>
     public event EventHandler<LocationRecord>? CenterRequested;
 
+    /// <summary>Loads saved history once; later calls do nothing.</summary>
     public async Task InitializeAsync()
     {
         if (_initialized || _isBusy)
@@ -111,6 +142,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         });
     }
 
+    /// <summary>Stops tracking when the app leaves the foreground; tracking is not resumed automatically.</summary>
     public async Task SuspendAsync()
     {
         _isActive = false;
@@ -125,6 +157,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         }
     }
 
+    /// <summary>Re-enables the Start command when the app returns to the foreground.</summary>
     public void Resume()
     {
         _isActive = true;
@@ -155,6 +188,7 @@ public sealed class MainViewModel : INotifyPropertyChanged
         UpdateCommands();
     }
 
+    // Runs one user action at a time and disables the other buttons while it runs.
     private async Task RunBusyAsync(Func<Task> action)
     {
         if (_isBusy)

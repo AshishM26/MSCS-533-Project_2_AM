@@ -3,6 +3,7 @@ using LocationTracker.Services;
 
 namespace LocationTracker.Tests;
 
+/// <summary>Verifies grid aggregation, density scaling, input validation, and the overlay cap.</summary>
 public sealed class HeatMapServiceTests
 {
     private readonly HeatMapService _service = new();

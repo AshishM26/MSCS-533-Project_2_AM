@@ -5,8 +5,10 @@ using LocationTracker.Views;
 
 namespace LocationTracker;
 
+/// <summary>Configures MAUI, the Maps handler, fonts, and dependency injection.</summary>
 public static class MauiProgram
 {
+    /// <summary>Builds the app; called by each platform's entry point.</summary>
     public static MauiApp CreateMauiApp()
     {
         var builder = MauiApp.CreateBuilder();
@@ -18,6 +20,7 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+        // Singletons: one database connection, one sampling loop, and one page for the app's lifetime.
         builder.Services.AddSingleton<ILocationDatabase>(_ =>
             new LocationDatabase(Path.Combine(FileSystem.AppDataDirectory, "locations.db3")));
         builder.Services.AddSingleton<ILocationProvider, MauiLocationProvider>();

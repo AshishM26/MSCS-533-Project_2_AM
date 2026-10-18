@@ -4,6 +4,7 @@ using LocationTracker.Services;
 
 namespace LocationTracker.Tests;
 
+/// <summary>Verifies the sampling loop with controllable fakes instead of real GPS and storage.</summary>
 public sealed class LocationTrackingServiceTests
 {
     [Fact]

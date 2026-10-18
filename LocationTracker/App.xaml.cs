@@ -3,6 +3,7 @@ using LocationTracker.Views;
 
 namespace LocationTracker;
 
+/// <summary>Application root: creates the single window and ties its lifecycle to tracking.</summary>
 public partial class App : Application
 {
     private readonly MainPage _page;
@@ -13,6 +14,8 @@ public partial class App : Application
         InitializeComponent();
         _page = page;
         _viewModel = viewModel;
+
+        // The page uses fixed light colors, so keep text readable when the device is in dark mode.
         UserAppTheme = AppTheme.Light;
     }
 

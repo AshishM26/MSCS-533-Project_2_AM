@@ -23,9 +23,9 @@ PATTERNS = {
 }
 
 
+
 def git(*arguments: str) -> bytes:
     return subprocess.check_output(["git", *arguments], cwd=ROOT)
-
 
 def scan(data: bytes, filename: str) -> list[str]:
     if filename.endswith(".docx"):
@@ -35,7 +35,6 @@ def scan(data: bytes, filename: str) -> list[str]:
         return []
     content = data.decode("utf-8", errors="replace")
     return [label for label, pattern in PATTERNS.items() if pattern.search(content)]
-
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -58,7 +57,6 @@ def main() -> int:
         return 1
     print(f"Checked {len(filenames)} files: no configured secret or personal-path patterns found.")
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())

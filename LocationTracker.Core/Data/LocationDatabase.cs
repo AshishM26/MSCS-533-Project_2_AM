@@ -9,6 +9,8 @@ public sealed class LocationDatabase(string databasePath) : ILocationDatabase, I
     private readonly SemaphoreSlim _gate = new(1, 1);
     private SQLiteAsyncConnection? _connection;
 
+    // Opens the file lazily so startup does no I/O until history is first needed.
+    // Callers must hold _gate, which keeps a single connection and table creation race-free.
     private async Task<SQLiteAsyncConnection> GetConnectionAsync()
     {
         if (_connection is not null)
@@ -65,6 +67,7 @@ public sealed class LocationDatabase(string databasePath) : ILocationDatabase, I
     public Task<int> GetLocationCountAsync() =>
         WithConnectionAsync(connection => connection.Table<LocationRecord>().CountAsync());
 
+    /// <summary>Closes the SQLite connection after any in-progress operation completes.</summary>
     public async ValueTask DisposeAsync()
     {
         await _gate.WaitAsync();

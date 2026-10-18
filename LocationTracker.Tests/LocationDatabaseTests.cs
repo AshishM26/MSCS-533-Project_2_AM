@@ -3,6 +3,7 @@ using LocationTracker.Models;
 
 namespace LocationTracker.Tests;
 
+/// <summary>Verifies SQLite persistence against a real temporary database file.</summary>
 public sealed class LocationDatabaseTests
 {
     [Fact]

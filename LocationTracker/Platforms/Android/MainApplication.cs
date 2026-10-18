@@ -3,6 +3,7 @@ using Android.Runtime;
 
 namespace LocationTracker;
 
+/// <summary>Android application object that boots the shared MAUI app.</summary>
 [Application]
 public class MainApplication : MauiApplication
 {

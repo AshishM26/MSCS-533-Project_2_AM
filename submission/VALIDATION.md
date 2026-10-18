@@ -1,6 +1,6 @@
 # Validation record — October 18, 2026
 
-Android compilation and automated tests pass. Device acceptance and the application screenshot remain incomplete.
+Android compilation and 16 automated tests passed again. Installation, launch, GPS saving, and restart persistence are now verified; full map acceptance and the final screenshot remain incomplete.
 
 ## Environment
 
@@ -32,9 +32,11 @@ Set `JAVA_HOME` to the compatible local Microsoft JDK when using these commands.
 
 ## Device validation
 
-The application has not completed device acceptance. Android installation encountered emulator package-service errors (`Broken pipe (32)` and `Can't find service: package`). Android map tiles also require a configured Google Maps key.
+A cold boot using host graphics resolved the previous package-service installation failure. Android reported `sys.boot_completed=1`, and its package service responded before the standalone Debug APK was installed successfully. The application launched and rendered its controls and location permission prompt. Two emulator-provided GPS readings were saved in SQLite and restored after force-stop/relaunch. Tracking did not restart automatically. Clear History displayed its confirmation dialog. Cancel retained both records; Delete removed them from SQLite, and another relaunch showed zero samples with Center/Clear disabled.
 
-The selected iOS demonstration requires full Xcode and an iOS simulator runtime. Tracking, native map rendering, centering, restart persistence, confirmed deletion, permission handling, and background-stop behavior still need the checks in [RUNTIME_GUIDE.md](RUNTIME_GUIDE.md).
+Map tiles remain blank because no local Google Maps key is configured. Route density, map centering, stop stability, permission-denial, and background behavior still require complete acceptance checks. Diagnostic captures remain outside the submission output; they are not evidence of a working map. Full Xcode is unavailable, so iOS was not run.
+
+Formatting verification passed with the compatible JDK available.
 
 ## Rubric coverage
 
@@ -46,7 +48,7 @@ The selected iOS demonstration requires full Xcode and an iOS simulator runtime.
 
 ## Remaining submission steps
 
-1. Install full Xcode and an iOS simulator runtime, then complete the runtime checklist.
+1. Configure a restricted Android Maps key in the ignored `LocationTracker/GoogleMaps.local.props`, rebuild, and complete the runtime checklist. Xcode is optional for this Android demonstration.
 2. Capture `screenshots/location-tracker-running.png` with map tiles and several recorded samples.
 3. Record the results in `validation.json`, regenerate `MSCS533_Final_Project_LocationTracker_AM.docx`, and review the embedded screenshot.
 4. Publish the final report and screenshot to GitHub, then submit the Word document and repository URL in Blackboard.

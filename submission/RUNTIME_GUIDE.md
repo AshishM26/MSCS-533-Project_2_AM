@@ -60,7 +60,7 @@ If automatic capture is unavailable, use Simulator **File > Save Screen** and sa
 
 ## Android alternative
 
-Configure the local Google Maps key as described in README. Use a Google APIs ARM64 emulator on Apple Silicon. After launching the app, grant permission and set emulator coordinates through Extended Controls > Location or `adb emu geo fix LONGITUDE LATITUDE` (longitude comes first).
+Copy `LocationTracker/GoogleMaps.local.props.example` to the ignored `LocationTracker/GoogleMaps.local.props` and replace the placeholder with a restricted Maps SDK for Android key for application ID `edu.cumberlands.ashish.locationtracker` and the signing certificate SHA-1. Enable Maps SDK for Android in that Google Cloud project. Use a Google APIs ARM64 emulator on Apple Silicon. After launching the app, grant permission and set emulator coordinates through Extended Controls > Location or `adb emu geo fix LONGITUDE LATITUDE` (longitude comes first).
 
 ```bash
 adb emu geo fix -84.1640 36.7370
@@ -68,3 +68,5 @@ adb exec-out screencap -p > submission/screenshots/location-tracker-running.png
 ```
 
 Run the same acceptance checks. A blank Android map with an invalid/placeholder key does not satisfy the final map-output requirement.
+
+Before installing an APK, cold-boot the dedicated test emulator and confirm `adb shell getprop sys.boot_completed` returns `1` and `adb shell pm list packages` works. Install the actual signed Debug APK using `adb install -r --no-streaming APK_PATH`. On the validation machine, API 36 cold boot with `-no-snapshot -gpu host` restored package-service responsiveness.

@@ -3,9 +3,10 @@
 - [x] C# source code present
 - [x] .NET MAUI Android project builds (0 warnings / 0 errors)
 - [ ] iOS build and simulator run verified (requires full Xcode)
-- [ ] Location tracking works in the running app
+- [x] Running app saved emulator GPS readings (full route acceptance still required)
 - [x] SQLite persistence passes save/reopen/delete integration tests
-- [ ] SQLite persistence verified across an app restart
+- [x] SQLite persistence verified across a force-stop/relaunch
+- [x] Clear confirmation, Cancel, Delete, and empty relaunch verified
 - [x] Heat-map aggregation passes automated tests
 - [ ] Heat-map circles and map tiles verified together in the running app
 - [x] Android permissions configured

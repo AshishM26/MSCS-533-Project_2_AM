@@ -1,0 +1,5 @@
+<Project>
+  <PropertyGroup>
+    <GoogleMapsApiKey>YOUR_GOOGLE_MAPS_API_KEY</GoogleMapsApiKey>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="LocationTracker.Core/LocationTracker.Core.csproj" />
+  <Project Path="LocationTracker.Tests/LocationTracker.Tests.csproj" />
+  <Project Path="LocationTracker/LocationTracker.csproj" />
+</Solution>

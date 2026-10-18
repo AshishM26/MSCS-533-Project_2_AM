@@ -12,7 +12,7 @@
 
 Location Tracker records foreground device locations in a local SQLite database and displays their relative density as colored circles on a native .NET MAUI map. It implements the final software development project assignment in C#.
 
-See [validation status](submission/VALIDATION.md) for what has actually been built, tested, and run. A successful build does not establish that GPS, permissions, or map tiles work on a device.
+Build results and remaining device checks are recorded in [validation status](submission/VALIDATION.md).
 
 ## Features
 
@@ -132,7 +132,7 @@ Open the solution in VS Code, select the MAUI launch target and the intended emu
 1. Enable **Maps SDK for Android** in your own Google Cloud project and create an API key. Configure billing if Google requires it.
 2. Restrict the key to the Android application ID `edu.cumberlands.ashish.locationtracker` and the SHA-1 of your actual signing certificate, and restrict API usage to Maps SDK for Android. Debug and release certificates differ.
 3. Copy `LocationTracker/GoogleMaps.local.props.example` to `LocationTracker/GoogleMaps.local.props`.
-4. Replace `YOUR_GOOGLE_MAPS_API_KEY` **only in the ignored local file**. Never paste the key in chat, README, or a commit.
+4. Replace `YOUR_GOOGLE_MAPS_API_KEY` **only in the ignored local file**. Keep credentials out of version control.
 5. Rebuild. MSBuild supplies the key to `${googleMapsApiKey}` in the generated Android manifest. Without a valid key, map tiles will be blank; a setup notice is shown when the placeholder is detected.
 
 The checked-in manifest and project keep the placeholder. Verify `git check-ignore LocationTracker/GoogleMaps.local.props` before committing. Build outputs also contain the key and are ignored. Run `python3 scripts/check_secrets.py --staged` before every commit. An embedded mobile API key is extractable from an APK; provider-side application and API restrictions remain essential.
@@ -142,13 +142,13 @@ The checked-in manifest and project keep the placeholder. Verify `git check-igno
 - Android: `ACCESS_COARSE_LOCATION`, `ACCESS_FINE_LOCATION`, internet/network state. GPS hardware is optional. No background permission or foreground background service is declared.
 - iOS: `NSLocationWhenInUseUsageDescription` in `Platforms/iOS/Info.plist`; no background-location mode.
 - Mac Catalyst: the same usage description and the sandbox location entitlement.
-- A denied request displays instructions to enable location through device Settings, which also covers permanently denied access. Disabled GPS and unsupported hardware receive distinct messages. Missing simulator coordinates/timeouts are retried without saving invented samples.
+- A denied request displays instructions to enable location through device Settings, which also covers permanently denied access. Disabled GPS and unsupported hardware receive distinct messages. Missing simulator coordinates and timeouts are retried without saving a sample.
 
 ## Runtime demonstration and screenshots
 
-Follow [RUNTIME_GUIDE.md](submission/RUNTIME_GUIDE.md), including restart persistence, clear confirmation, permission denial, and background-stop checks. Configure coordinates through the simulator's own location controls; production code never seeds demonstration samples.
+Follow [RUNTIME_GUIDE.md](submission/RUNTIME_GUIDE.md) for simulated locations, restart persistence, clear confirmation, permission denial, and background-stop checks.
 
-The final screenshot belongs at `submission/screenshots/location-tracker-running.png`. It must show the real running application with map tiles and several tracked samples. Until that file is captured, the Word report clearly marks Application Output as pending. The assignment's reference image is not used as execution evidence.
+Save the running application's screenshot at `submission/screenshots/location-tracker-running.png`, showing map tiles, tracked samples, and density circles. The Word report remains a draft until device validation and screenshot capture are complete.
 
 To regenerate the Word document:
 

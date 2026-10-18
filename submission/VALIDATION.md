@@ -1,67 +1,54 @@
 # Validation record — October 18, 2026
 
-This record distinguishes implementation, automated checks, and actual device evidence. The submission is not yet complete without the final map-output screenshot.
+Android compilation and automated tests pass. Device acceptance and the application screenshot remain incomplete.
 
-## Environment audit and installation
+## Environment
 
-| Item | Observed result |
+| Item | Version or status |
 |---|---|
 | OS / CPU | macOS 26.7.1, Apple Silicon arm64 |
-| VS Code / CLI | 1.142.0, arm64; `code` available |
-| Git | 2.50.1 |
-| .NET SDK / runtime | Stable SDK 10.0.302 / runtime 10.0.10 |
-| MAUI workload | Installed and repaired; workload set 10.0.303.1, MAUI manifest 10.0.20 |
+| VS Code / Git | 1.142.0 / 2.50.1 |
+| .NET SDK / runtime | 10.0.302 / 10.0.10 |
+| MAUI workload | Workload set 10.0.303.1, MAUI manifest 10.0.20 |
 | MAUI application packages | Microsoft.Maui.Controls and Controls.Maps 10.0.100 |
-| Templates | Official Microsoft.Maui.Templates.net10 10.0.110 |
-| Microsoft extensions | MAUI 1.17.289, C# Dev Kit 3.40.210, C# 2.160.4 installed and verified |
-| Android | SDK API 36 and build/platform tools installed through `InstallAndroidDependencies` |
-| Java | Existing Oracle JDK 24.0.2; dependency installer provisioned Microsoft OpenJDK 17.0.14, used for the successful Android build |
-| Emulator | Android emulator 37.2.12; dedicated Pixel 7 / Google APIs API 36 ARM64 device |
-| Xcode / iOS simulator | Full Xcode absent at last verification; only Command Line Tools available; `simctl` unavailable |
-| Repository | Existing `main` branch and origin preserved; selected URL confirmed by the student |
+| Microsoft extensions | MAUI 1.17.289, C# Dev Kit 3.40.210, C# 2.160.4 |
+| Android / Java | SDK API 36; Microsoft OpenJDK 17.0.14 used for the build |
+| Emulator | Android emulator 37.2.12; Pixel 7 / Google APIs API 36 ARM64 |
+| Xcode / iOS simulator | Full Xcode and `simctl` unavailable; Command Line Tools only |
 
-No .NET 11 preview SDK is used by the project. The first MAUI workload installation left missing packs; `dotnet workload repair` restored them, and the official .NET 10 template was registered separately.
+## Build and test results
 
-## Commands and results
-
-Commands below omit machine-specific JDK paths. Set `JAVA_HOME` to the compatible local Microsoft JDK.
+Set `JAVA_HOME` to the compatible local Microsoft JDK when using these commands.
 
 | Command | Result |
 |---|---|
 | `dotnet restore LocationTracker.slnx` | Passed |
 | `dotnet test LocationTracker.Tests/LocationTracker.Tests.csproj` | 16 passed, 0 failed |
 | `dotnet build LocationTracker/LocationTracker.csproj -f net10.0-android -p:JavaSdkDirectory="$JAVA_HOME"` | Passed; 0 warnings, 0 errors |
-| `dotnet build LocationTracker/LocationTracker.csproj -f net10.0-ios -p:RuntimeIdentifier=iossimulator-arm64` | Blocked: valid Xcode installation not found |
-| `dotnet build LocationTracker.slnx -p:JavaSdkDirectory="$JAVA_HOME"` | Android/core/tests compile; iOS/Mac Catalyst fail because Xcode is missing |
+| `dotnet build LocationTracker/LocationTracker.csproj -f net10.0-ios -p:RuntimeIdentifier=iossimulator-arm64` | Blocked by missing Xcode |
+| `dotnet build LocationTracker.slnx -p:JavaSdkDirectory="$JAVA_HOME"` | Android/core/tests compile; Apple targets require Xcode |
 | `dotnet format LocationTracker.slnx --no-restore` | Passed |
-| `python3 scripts/check_secrets.py` | Passed before final staging; repeat with `--staged` before every commit |
+| `python3 scripts/check_secrets.py` | Passed |
 
-The Android package embeds managed assemblies so a Debug APK can be installed directly using `adb`. A default fast-deployment APK was initially unable to start when installed outside the IDE; the project configuration was corrected before runtime acceptance.
+## Device validation
 
-## Runtime evidence
+The application has not completed device acceptance. Android installation encountered emulator package-service errors (`Broken pipe (32)` and `Can't find service: package`). Android map tiles also require a configured Google Maps key.
 
-Runtime acceptance is incomplete. The initial Android APK installed but exited because it expected IDE fast deployment. After embedding managed assemblies, the rebuilt APK compiled with zero warnings/errors. Reinstallation stalled in the emulator package service (`Broken pipe (32)`); a reboot and non-streaming retry then returned `Can't find service: package`. The rebuilt application has not been verified running. Tracking, on-device persistence, centering, clear-history behavior, and native map rendering remain unchecked. Portable SQLite and tracking tests passed separately.
+The selected iOS demonstration requires full Xcode and an iOS simulator runtime. Tracking, native map rendering, centering, restart persistence, confirmed deletion, permission handling, and background-stop behavior still need the checks in [RUNTIME_GUIDE.md](RUNTIME_GUIDE.md).
 
-Android map tiles also require a valid key, which is not configured. The student selected iOS for the final map demonstration and screenshot; iOS build/run awaits full Xcode and a simulator runtime. Do not substitute an emulator home-screen capture, blank map, generated mockup, or assignment reference image for the final application output.
+## Rubric coverage
 
-## Deliverables and Git history
-
-- Source and tests: GitHub commit `25a2972` (`feat: implement MAUI location tracking with SQLite and density maps`).
-- Word report: `MSCS533_Final_Project_LocationTracker_AM.docx`, generated and reopened to verify all 10 required sections. It is marked DRAFT and intentionally contains no fabricated screenshot.
-- Final image path reserved: `screenshots/location-tracker-running.png`; file not yet present.
-- README, runtime guide, rubric checklist, reproducible Word generator, and staged secret scanner included.
-- Repository: https://github.com/AshishM26/MSCS-533-Project_2_AM (main).
-
-## Rubric audit
-
-| Area | Evidence and remaining work | Provisional readiness |
+| Area | Completed | Remaining |
 |---|---|---|
-| Application requirements (25) | C#/MAUI source, SQLite, foreground tracking, native circle density layer, controls, and platform permissions implemented. Final native map output remains to be verified. | 23/25 |
-| Coding standards (50) | Focused layers, MVVM, dependency injection, async cancellation, naming/formatting, explanatory comments, error handling, 16 behavioral tests, and secret exclusions. | 47/50 |
-| Runtime/correctness/submission (50) | Restore, Android build, and automated tests pass. Full application runtime acceptance, iOS execution, final screenshot, and final Word image insertion remain pending. | 25/50 |
+| Application requirements — 25 points | C#/MAUI source, SQLite, foreground tracking, density layer, controls, platform permissions | Verify the features on a running device or simulator |
+| Coding standards — 50 points | MVVM, focused services, dependency injection, asynchronous cancellation, comments, formatting, 16 behavioral tests | Review any fixes arising from device validation |
+| Runtime, correctness, submission — 50 points | Restore, Android build, automated tests, source/manifest documentation, GitHub repository | Successful device run, screenshot, completed Word report, Blackboard submission |
 
-These are conservative readiness estimates, not a predicted instructor grade. Reassess after completing the runtime checklist.
+## Remaining submission steps
 
-## Smallest remaining action
+1. Install full Xcode and an iOS simulator runtime, then complete the runtime checklist.
+2. Capture `screenshots/location-tracker-running.png` with map tiles and several recorded samples.
+3. Record the results in `validation.json`, regenerate `MSCS533_Final_Project_LocationTracker_AM.docx`, and review the embedded screenshot.
+4. Publish the final report and screenshot to GitHub, then submit the Word document and repository URL in Blackboard.
 
-Install full Xcode, open it once to complete setup, and install an iOS simulator runtime. Select it with `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer` and run `sudo xcodebuild -runFirstLaunch`. Then follow `RUNTIME_GUIDE.md`, capture the real screenshot, update this record and `validation.json`, and regenerate the Word file. Android's Google Maps key is not needed for that iOS path.
+The current Word document contains the required ten sections, a C# excerpt, the Android manifest, and the repository link. It remains a draft until the runtime results and screenshot are included.

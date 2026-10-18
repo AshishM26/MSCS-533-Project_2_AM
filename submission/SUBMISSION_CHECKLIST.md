@@ -16,8 +16,8 @@
 - [x] README complete
 - [x] Comments / coding standards reviewed
 - [x] Secret and personal-path pattern scan passes on Git-visible source
-- [x] Staged files scanned before implementation and documentation commits
-- [x] Repository published through the connected GitHub account
-- [x] Working tree clean and synchronized with the published commits
+- [x] Source code and current report published to GitHub
+- [ ] Final runtime results, screenshot, and completed report published to GitHub
+- [ ] Word document and repository URL submitted in Blackboard
 
-The Word report is a draft until its Application Output section contains the actual map screenshot and runtime results are recorded. See `VALIDATION.md` for the exact blockers and `RUNTIME_GUIDE.md` for acceptance steps.
+See [VALIDATION.md](VALIDATION.md) for current results and [RUNTIME_GUIDE.md](RUNTIME_GUIDE.md) for the remaining device checks.

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate the report, embedding only an actual screenshot supplied by runtime capture."""
+"""Generate the submission report from project sources and recorded validation results."""
 
 import json
 from pathlib import Path
@@ -77,7 +77,7 @@ def main() -> None:
         document.add_paragraph(line)
     if not SCREENSHOT.exists() or not status["runtime_complete"]:
         paragraph = document.add_paragraph()
-        run = paragraph.add_run("DRAFT — final map runtime evidence and application screenshot are pending.")
+        run = paragraph.add_run("DRAFT — device validation and application screenshot pending.")
         run.bold = True
         run.font.color.rgb = RGBColor.from_string("9E2040")
     add_link(document.add_paragraph(), REPOSITORY, REPOSITORY)
@@ -106,7 +106,7 @@ def main() -> None:
     ):
         cells = table.add_row().cells
         cells[0].text, cells[1].text = requirement, implementation
-    document.add_paragraph("Implementation does not by itself establish runtime acceptance. Verified results and remaining limitations appear in Section 8.")
+    document.add_paragraph("Build, test, and device-validation results appear in Section 8.")
 
     document.add_heading("3. Technologies Used", level=1)
     document.add_paragraph(
@@ -196,17 +196,15 @@ def main() -> None:
         document.add_paragraph(status.get("screenshot_caption", "Figure 1. Actual application output captured from the running simulator."), "Caption")
     else:
         document.add_paragraph(
-            "Screenshot pending: no final map-output screenshot has been captured. Install and configure Xcode "
-            "and an iOS simulator, execute the acceptance checks in submission/RUNTIME_GUIDE.md, and capture "
-            "submission/screenshots/location-tracker-running.png. Rerun scripts/create_submission.py to embed it. "
-            "This draft must not be submitted as proof of completed runtime validation."
+        "Application screenshot pending. The final image will show the running application with map tiles, "
+        "recorded locations, density circles, status, sample count, and controls."
         )
 
     document.add_heading("9. GitHub Repository", level=1)
     add_link(document.add_paragraph(), REPOSITORY, REPOSITORY)
     document.add_paragraph(
         "The repository provides the complete C# source, MAUI project, platform manifests, automated tests, "
-        "README, and validation instructions. Build output, simulator data, local keys, and private machine paths "
+        "README, and setup documentation. Build output, simulator data, local keys, and private machine paths "
         "are excluded from version control. Source code is shared through GitHub rather than reproduced in full here."
     )
 

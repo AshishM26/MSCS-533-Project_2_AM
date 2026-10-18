@@ -17,13 +17,13 @@ xcrun simctl install booted LocationTracker/bin/Debug/net10.0-ios/iossimulator-a
 xcrun simctl launch booted edu.cumberlands.ashish.locationtracker
 ```
 
-6. Tap Start Tracking and allow location while using the app. In Simulator choose **Features > Location > Custom Location**, or use the legitimate simulator command below.
+6. Tap Start Tracking and allow location while using the app. In Simulator choose **Features > Location > Custom Location**, or use the command below.
 
 ```bash
 xcrun simctl location booted set 36.7370,-84.1640
 ```
 
-7. Leave the app in the foreground for at least 30 seconds. Move through a few nearby locations, allowing at least 10 seconds for each. Dwell at one location for 40 seconds to give cells different counts. These are simulator coordinates, not real travel claims.
+7. Leave the app in the foreground for at least 30 seconds. Move through a few nearby simulated locations, allowing at least 10 seconds for each. Dwell at one location for 40 seconds to give cells different counts.
 
 ```bash
 xcrun simctl location booted set 36.7380,-84.1640
@@ -31,7 +31,7 @@ xcrun simctl location booted set 36.7390,-84.1630
 xcrun simctl location booted set 36.7400,-84.1620
 ```
 
-Run those commands separately with the dwell time between them. Do not bulk-insert records into the app database.
+Run those commands separately with the dwell time between them so the app records each position through its location service.
 
 ## Required acceptance checks
 
@@ -48,7 +48,7 @@ Run those commands separately with the dwell time between them. Do not bulk-inse
 | Relaunch after clear | Zero samples remain. |
 | Background while tracking | Sampling stops; returning to the app requires Start. |
 | Deny permission | Useful denial/settings message; no records saved; app remains usable. |
-| GPS disabled / no simulator location | Useful status; no crash or fabricated sample. |
+| GPS disabled / no simulator location | Useful status; no crash or saved sample. |
 
 Capture the screenshot before deleting the demonstration history, or repeat the short route afterward.
 

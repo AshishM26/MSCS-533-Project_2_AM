@@ -17,7 +17,7 @@
 - [x] Comments / coding standards reviewed
 - [x] Secret and personal-path pattern scan passes on Git-visible source
 - [x] Staged files scanned before implementation and documentation commits
-- [ ] Repository pushed
-- [ ] Final git status clean
+- [x] Repository published through the connected GitHub account
+- [x] Working tree clean and synchronized with the published commits
 
 The Word report is a draft until its Application Output section contains the actual map screenshot and runtime results are recorded. See `VALIDATION.md` for the exact blockers and `RUNTIME_GUIDE.md` for acceptance steps.

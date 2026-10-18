@@ -1,4 +1,3 @@
 # Application output
 
-Save a screenshot of the running application here as `location-tracker-running.png`.
-Include map tiles, tracked samples, density circles, status, and controls. See [the runtime guide](../RUNTIME_GUIDE.md).
+`location-tracker-running.png` is an unedited capture of the running app on the iOS simulator (Apple Maps). It shows recorded positions and heat-map circles from simulated GPS readings saved in SQLite. See [VALIDATION.md](../VALIDATION.md) for how it was produced.

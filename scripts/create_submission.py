@@ -18,6 +18,7 @@ OUTPUT = SUBMISSION / "MSCS533_Final_Project_LocationTracker_AM.docx"
 REPOSITORY = "https://github.com/AshishM26/MSCS-533-Project_2_AM"
 
 
+
 def add_link(paragraph, label: str, url: str) -> None:
     relationship = paragraph.part.relate_to(
         url, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", is_external=True
@@ -36,7 +37,6 @@ def add_link(paragraph, label: str, url: str) -> None:
     hyperlink.append(run)
     paragraph._p.append(hyperlink)
 
-
 def add_code(document, source: str) -> None:
     paragraph = document.add_paragraph()
     paragraph.paragraph_format.keep_together = True
@@ -45,9 +45,11 @@ def add_code(document, source: str) -> None:
     run.font.name = "Consolas"
     run.font.size = Pt(8)
 
-
 def main() -> None:
     status = json.loads((SUBMISSION / "validation.json").read_text())
+    # The report is only generated from completed, recorded runtime evidence.
+    if not SCREENSHOT.exists() or not status["runtime_complete"]:
+        raise SystemExit("Record runtime results in validation.json and add the screenshot first.")
     document = Document()
     section = document.sections[0]
     section.top_margin = Inches(0.8)
@@ -75,11 +77,6 @@ def main() -> None:
         f"Validation date: {status['date']}",
     ):
         document.add_paragraph(line)
-    if not SCREENSHOT.exists() or not status["runtime_complete"]:
-        paragraph = document.add_paragraph()
-        run = paragraph.add_run("DRAFT — device validation and application screenshot pending.")
-        run.bold = True
-        run.font.color.rgb = RGBColor.from_string("9E2040")
     add_link(document.add_paragraph(), REPOSITORY, REPOSITORY)
     document.add_page_break()
 
@@ -112,7 +109,8 @@ def main() -> None:
     document.add_paragraph(
         ".NET SDK 10.0.302; C# with nullable reference types; .NET MAUI Controls and Maps 10.0.100; "
         "sqlite-net-pcl 1.11.285; xUnit; built-in dependency injection; and VS Code with Microsoft's MAUI, "
-        "C# Dev Kit, and C# extensions. No .NET 11 preview is targeted."
+        "C# Dev Kit, and C# extensions. Runtime validation used Xcode 27.1 with an iOS 27.1 simulator (Apple Maps) "
+        "and an Android API 36 emulator. No .NET 11 preview is targeted."
     )
 
     document.add_heading("4. Application Architecture", level=1)
@@ -190,15 +188,9 @@ def main() -> None:
     document.add_paragraph(status["tests"])
     document.add_paragraph(status["builds"])
     document.add_paragraph(status["runtime"])
-    if SCREENSHOT.exists():
-        document.add_picture(str(SCREENSHOT), width=Inches(3.1))
-        document.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
-        document.add_paragraph(status.get("screenshot_caption", "Figure 1. Actual application output captured from the running simulator."), "Caption")
-    else:
-        document.add_paragraph(
-        "Application screenshot pending. The final image will show the running application with map tiles, "
-        "recorded locations, density circles, status, sample count, and controls."
-        )
+    document.add_picture(str(SCREENSHOT), width=Inches(3.1))
+    document.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    document.add_paragraph(status["screenshot_caption"], "Caption")
 
     document.add_heading("9. GitHub Repository", level=1)
     add_link(document.add_paragraph(), REPOSITORY, REPOSITORY)
@@ -211,10 +203,9 @@ def main() -> None:
     document.add_heading("10. Conclusion", level=1)
     document.add_paragraph(
         "The implementation brings together foreground geolocation, asynchronous SQLite persistence, and a native "
-        "map density overlay using a maintainable MVVM design. Automated tests verify portable behavior, while "
-        "device-specific permission, map rendering, and lifecycle checks are tracked separately. "
-        + ("The recorded runtime checks and screenshot provide the application-output evidence." if status["runtime_complete"] and SCREENSHOT.exists()
-           else "Final submission readiness remains conditional on completing the map runtime checks and inserting the real screenshot.")
+        "map density overlay using a maintainable MVVM design. Automated tests verify the portable behavior, and "
+        "runtime checks on the iOS simulator and Android emulator confirm permissions, persistence, map rendering, "
+        "and lifecycle handling. The screenshot in Section 8 shows the running application with its recorded heat map."
     )
 
     document.add_heading("References", level=1)
@@ -233,11 +224,10 @@ def main() -> None:
     footer._p.append(field)
     document.save(OUTPUT)
     reopened = Document(OUTPUT)
-    expected_images = 1 if SCREENSHOT.exists() else 0
+    expected_images = 1
     assert len(reopened.inline_shapes) == expected_images
     assert all(any(p.text.startswith(f"{index}.") for p in reopened.paragraphs) for index in range(1, 11))
     print(f"Created {OUTPUT.relative_to(ROOT)}; verified 10 sections and {expected_images} embedded screenshot(s).")
-
 
 if __name__ == "__main__":
     main()
